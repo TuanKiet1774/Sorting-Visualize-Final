@@ -1,95 +1,97 @@
 import time
 
 ###############################-SẮP XẾP CHỌN-###############################
-def selection_sort(data, drawData, timeTick, ascending = True):
+def selection_sort(data, drawData, timeTick, ascending=True, pause_flag=None):
     for i in range(len(data)-1):
-        idx = i  # Giả sử phần tử cần tìm là phần tử đầu tiên chưa được sắp xếp
+        idx = i
         for j in range(i+1, len(data)):
-            # Nếu sắp xếp theo chiều tăng dần
             if (ascending and data[j] < data[idx]) or (not ascending and data[j] > data[idx]):
-                idx = j  # Cập nhật chỉ số phần tử cần tìm
-
-        # Hoán đổi nếu phần tử cần tìm không phải là phần tử ban đầu
+                idx = j
+            if pause_flag:
+                pause_flag.wait()
+        
         if idx != i:
             data[i], data[idx] = data[idx], data[i]
             drawData(data, ['green' if x == i or x == idx else 'red' for x in range(len(data))])
             time.sleep(timeTick)
-
-    # Hiển thị màu xanh cho toàn bộ mảng sau khi sắp xếp xong
-    drawData(data, ['green' for x in range(len(data))])
+            if pause_flag:
+                pause_flag.wait()
     
+    drawData(data, ['green' for x in range(len(data))])
+
 ###############################-SẮP XẾP CHÈN-###############################
-def insertion_sort(data, drawData, timeTick, ascending=True):
+def insertion_sort(data, drawData, timeTick, ascending=True, pause_flag=None):
     for i in range(1, len(data)):
         current_value = data[i]
-        j = i - 1    
-        # sang một vị trí bên phải để chừa chỗ cho current_value
+        j = i - 1
         while j >= 0 and ((ascending and data[j] > current_value) or (not ascending and data[j] < current_value)):
             data[j + 1] = data[j]
             j -= 1
-        
-        # Chèn giá trị hiện tại vào đúng vị trí
+            if pause_flag:
+                pause_flag.wait()
         data[j + 1] = current_value
-        
-        # Cập nhật đồ họa cho mỗi lần chèn
         drawData(data, ['green' if x == j + 1 else 'red' for x in range(len(data))])
         time.sleep(timeTick)
+        if pause_flag:
+            pause_flag.wait()
     
-    # Hiển thị màu xanh cho toàn bộ mảng sau khi sắp xếp xong
     drawData(data, ['green' for x in range(len(data))])
 
 ###############################-SẮP XẾP NỔI BỌT-###############################
-def bubble_sort(data, drawData, timeTick, ascending=True):
+def bubble_sort(data, drawData, timeTick, ascending=True, pause_flag=None):
     for _ in range(len(data)-1):
         for j in range(len(data)-1):
-            # Thay đổi điều kiện so sánh tùy thuộc vào hướng sắp xếp
             if (ascending and data[j] > data[j+1]) or (not ascending and data[j] < data[j+1]):
                 data[j], data[j+1] = data[j+1], data[j]
                 drawData(data, ['green' if x == j or x == j+1 else 'red' for x in range(len(data))])
                 time.sleep(timeTick)
+                if pause_flag:
+                    pause_flag.wait()
+    
     drawData(data, ['green' for x in range(len(data))])
 
 ###############################-SẮP XẾP TRỘN-###############################
-def merge_sort(data, drawData, timeTick, ascending=True):
-    merge_sort_alg(data, 0, len(data)-1, drawData, timeTick, ascending)
+def merge_sort(data, drawData, timeTick, ascending=True, pause_flag=None):
+    merge_sort_alg(data, 0, len(data)-1, drawData, timeTick, ascending, pause_flag)
 
-def merge_sort_alg(data, left, right, drawData, timeTick, ascending):
+def merge_sort_alg(data, left, right, drawData, timeTick, ascending, pause_flag):
     if left < right:
         middle = (left + right) // 2
-        merge_sort_alg(data, left, middle, drawData, timeTick, ascending)
-        merge_sort_alg(data, middle+1, right, drawData, timeTick, ascending)
-        merge(data, left, middle, right, drawData, timeTick, ascending)
+        merge_sort_alg(data, left, middle, drawData, timeTick, ascending, pause_flag)
+        merge_sort_alg(data, middle+1, right, drawData, timeTick, ascending, pause_flag)
+        merge(data, left, middle, right, drawData, timeTick, ascending, pause_flag)
 
-def merge(data, left, middle, right, drawData, timeTick, ascending):
-    drawData(data, getColorArray(len(data), left, middle, right))
+def merge(data, left, middle, right, drawData, timeTick, ascending, pause_flag):
+    if pause_flag:
+        pause_flag.wait()
+    drawData(data, getColorArray_merge(len(data), left, middle, right))
     time.sleep(timeTick)
-
+    
     leftPart = data[left:middle+1]
-    rightPart = data[middle+1: right+1]
-
-    leftIdx = rightIdx = 0
-
+    rightPart = data[middle+1:right+1]
+    leftIdx, rightIdx = 0, 0
+    
     for dataIdx in range(left, right+1):
         if leftIdx < len(leftPart) and rightIdx < len(rightPart):
-            # Điều kiện so sánh thay đổi tùy theo chiều sắp xếp
             if (ascending and leftPart[leftIdx] <= rightPart[rightIdx]) or (not ascending and leftPart[leftIdx] >= rightPart[rightIdx]):
                 data[dataIdx] = leftPart[leftIdx]
                 leftIdx += 1
             else:
                 data[dataIdx] = rightPart[rightIdx]
                 rightIdx += 1
-        
         elif leftIdx < len(leftPart):
             data[dataIdx] = leftPart[leftIdx]
             leftIdx += 1
         else:
             data[dataIdx] = rightPart[rightIdx]
             rightIdx += 1
-    
-    drawData(data, ["green" if x >= left and x <= right else "white" for x in range(len(data))])
-    time.sleep(timeTick)
+        
+        if pause_flag:
+            pause_flag.wait()
+        drawData(data, ["green" if x >= left and x <= right else "white" for x in range(len(data))])
+        time.sleep(timeTick)
 
-def getColorArray(length, left, middle, right):
+def getColorArray_merge(length, left, middle, right):
     colorArray = []
 
     for i in range(length):
@@ -102,46 +104,35 @@ def getColorArray(length, left, middle, right):
             colorArray.append("white")
 
     return colorArray
-  
+
 ###############################-SẮP XẾP NHANH-###############################
-def partition(data, head, tail, drawData, timeTick, ascending = True):
+def quick_sort(data, head, tail, drawData, timeTick, ascending, pause_flag=None):
+    if head < tail:
+        partitionIdx = partition(data, head, tail, drawData, timeTick, ascending, pause_flag)
+        quick_sort(data, head, partitionIdx-1, drawData, timeTick, ascending, pause_flag)
+        quick_sort(data, partitionIdx+1, tail, drawData, timeTick, ascending, pause_flag)
+
+def partition(data, head, tail, drawData, timeTick, ascending, pause_flag):
     border = head
     pivot = data[tail]
-
-    drawData(data, getColorArray(len(data), head, tail, border, border))
+    drawData(data, getColorArray_quick(len(data), head, tail, border, border))
     time.sleep(timeTick)
 
     for j in range(head, tail):
-        # Điều chỉnh điều kiện so sánh theo chiều sắp xếp
+        if pause_flag:
+            pause_flag.wait()
         if (ascending and data[j] < pivot) or (not ascending and data[j] > pivot):
-            drawData(data, getColorArray(len(data), head, tail, border, j, True))
+            drawData(data, getColorArray_quick(len(data), head, tail, border, j, True))
             time.sleep(timeTick)
-
+            if pause_flag:
+                pause_flag.wait()
             data[border], data[j] = data[j], data[border]
             border += 1
 
-        drawData(data, getColorArray(len(data), head, tail, border, j))
-        time.sleep(timeTick)
-
-    # Swap pivot with border value
-    drawData(data, getColorArray(len(data), head, tail, border, tail, True))
-    time.sleep(timeTick)
-
     data[border], data[tail] = data[tail], data[border]
-    
     return border
 
-def quick_sort(data, head, tail, drawData, timeTick, ascending):
-    if head < tail:
-        partitionIdx = partition(data, head, tail, drawData, timeTick, ascending)
-
-        # LEFT PARTITION
-        quick_sort(data, head, partitionIdx-1, drawData, timeTick, ascending)
-
-        # RIGHT PARTITION
-        quick_sort(data, partitionIdx+1, tail, drawData, timeTick, ascending)
-
-def getColorArray(dataLen, head, tail, border, currIdx, isSwaping=False):
+def getColorArray_quick(dataLen, head, tail, border, currIdx, isSwaping=False):
     colorArray = []
     for i in range(dataLen):
         # Base coloring
@@ -164,45 +155,30 @@ def getColorArray(dataLen, head, tail, border, currIdx, isSwaping=False):
     return colorArray
 
 ###############################-SẮP XẾP VUN ĐỐNG-###############################
-def heapify(data, n, i, drawData, timeTick, ascending=True):
-    largest_or_smallest = i  # Gốc hiện tại
-    left = 2 * i + 1  # Con trái
-    right = 2 * i + 2  # Con phải
-
-    # Nếu con trái lớn hơn (hoặc nhỏ hơn nếu sắp xếp giảm dần) gốc
-    if left < n and ((ascending and data[left] > data[largest_or_smallest]) or 
-                     (not ascending and data[left] < data[largest_or_smallest])):
+def heapify(data, n, i, drawData, timeTick, ascending=True, pause_flag=None):
+    largest_or_smallest = i
+    left, right = 2*i + 1, 2*i + 2
+    if left < n and ((ascending and data[left] > data[largest_or_smallest]) or (not ascending and data[left] < data[largest_or_smallest])):
         largest_or_smallest = left
-
-    # Nếu con phải lớn hơn (hoặc nhỏ hơn nếu sắp xếp giảm dần) gốc
-    if right < n and ((ascending and data[right] > data[largest_or_smallest]) or 
-                      (not ascending and data[right] < data[largest_or_smallest])):
+    if right < n and ((ascending and data[right] > data[largest_or_smallest]) or (not ascending and data[right] < data[largest_or_smallest])):
         largest_or_smallest = right
-
-    # Nếu gốc không phải là lớn nhất (hoặc nhỏ nhất)
     if largest_or_smallest != i:
         data[i], data[largest_or_smallest] = data[largest_or_smallest], data[i]
         drawData(data, ['green' if x == i or x == largest_or_smallest else 'red' for x in range(len(data))])
         time.sleep(timeTick)
+        if pause_flag:
+            pause_flag.wait()
+        heapify(data, n, largest_or_smallest, drawData, timeTick, ascending, pause_flag)
 
-        # Đệ quy heapify cây con bị thay đổi
-        heapify(data, n, largest_or_smallest, drawData, timeTick, ascending)
-
-def heap_sort(data, drawData, timeTick, ascending=True):
+def heap_sort(data, drawData, timeTick, ascending=True, pause_flag=None):
     n = len(data)
-
-    # Xây dựng một max heap hoặc min heap (tùy thuộc vào thứ tự sắp xếp)
     for i in range(n // 2 - 1, -1, -1):
-        heapify(data, n, i, drawData, timeTick, ascending)
-
-    # Trích xuất từng phần tử khỏi heap
+        heapify(data, n, i, drawData, timeTick, ascending, pause_flag)
     for i in range(n - 1, 0, -1):
-        data[i], data[0] = data[0], data[i]  # Hoán đổi phần tử gốc với phần tử cuối
+        data[i], data[0] = data[0], data[i]
         drawData(data, ['green' if x == i else 'red' for x in range(len(data))])
         time.sleep(timeTick)
-
-        # Gọi heapify trên heap đã giảm kích thước
-        heapify(data, i, 0, drawData, timeTick, ascending)
-
-    # Hiển thị màu xanh cho toàn bộ mảng sau khi sắp xếp xong
+        if pause_flag:
+            pause_flag.wait()
+        heapify(data, i, 0, drawData, timeTick, ascending, pause_flag)
     drawData(data, ['green' for x in range(len(data))])

@@ -2,6 +2,7 @@ from tkinter import *
 from tkinter import ttk
 from tkinter import messagebox
 import random
+import threading
 from Sort import *
 
 root = Tk()
@@ -13,6 +14,19 @@ root.config(bg='black')
 selected_alg = StringVar(value="Chọn thuật toán")  # Giá trị mặc định
 data = []
 sort_order = StringVar(value="Ascending")  # Giá trị mặc định cho sắp xếp
+
+pause_flag = threading.Event()
+pause_flag.set()  # Bắt đầu ở trạng thái chạy
+
+def toggle_pause(event=None):
+    if pause_flag.is_set():
+        pause_flag.clear()  # Tạm dừng
+    else:
+        pause_flag.set()  # Tiếp tục
+
+while not pause_flag.is_set():
+    root.update_idletasks()  # Cho phép giao diện tiếp tục hoạt động
+
 
 # Functions
 def Display(data, colorArray):
@@ -34,10 +48,10 @@ def Display(data, colorArray):
 
 def Create_Array():
     global data
-    minVal = int(minEntry.get())
-    maxVal = int(maxEntry.get())
+    min = int(minEntry.get())
+    max = int(maxEntry.get())
     size = int(sizeEntry.get())
-    data = [random.randrange(minVal, maxVal+1) for _ in range(size)]
+    data = [random.randrange(min, max+1) for _ in range(size)]
     Display(data, ['blue' for _ in range(len(data))])
 
 def Sort_Algorithm():
@@ -48,20 +62,27 @@ def Sort_Algorithm():
     ascending = sort_order.get() == "Ascending"
     alg = selected_alg.get()
 
-    if alg == 'Quick Sort':
-        quick_sort(data, 0, len(data)-1, Display, speedScale.get(), ascending)
-    elif alg == 'Bubble Sort':
-        bubble_sort(data, Display, speedScale.get(), ascending)
-    elif alg == 'Merge Sort':
-        merge_sort(data, Display, speedScale.get(), ascending)
-    elif alg == 'Selection Sort':
-        selection_sort(data, Display, speedScale.get(), ascending)
-    elif alg == 'Insertion Sort':
-        insertion_sort(data, Display, speedScale.get(), ascending)
-    elif alg == 'Heap Sort':
-        heap_sort(data, Display, speedScale.get(), ascending)
-    
-    Display(data, ['green' for _ in range(len(data))])
+    # Định nghĩa hàm chạy thuật toán sắp xếp trong một thread
+    def run_sort_algorithm():
+        if alg == 'Quick Sort':
+            quick_sort(data, 0, len(data)-1, Display, speedScale.get(), ascending, pause_flag)
+        elif alg == 'Bubble Sort':
+            bubble_sort(data, Display, speedScale.get(), ascending, pause_flag)
+        elif alg == 'Merge Sort':
+            merge_sort(data, Display, speedScale.get(), ascending, pause_flag)
+        elif alg == 'Selection Sort':
+            selection_sort(data, Display, speedScale.get(), ascending, pause_flag)
+        elif alg == 'Insertion Sort':
+            insertion_sort(data, Display, speedScale.get(), ascending, pause_flag)
+        elif alg == 'Heap Sort':
+            heap_sort(data, Display, speedScale.get(), ascending, pause_flag)
+
+        # Sau khi thuật toán hoàn thành, hiển thị mảng đã sắp xếp
+        Display(data, ['green' for _ in range(len(data))])
+
+    # Tạo một thread mới để chạy thuật toán
+    sort_thread = threading.Thread(target=run_sort_algorithm)
+    sort_thread.start()
 
 def Input_Array():
     def confirmArray():
@@ -116,9 +137,12 @@ maxEntry.grid(row=1, column=2, padx=5, pady=5)
 Label(UI_frame, text="Chiều: ", bg='grey').grid(row=2, column=0, padx=5, pady=5, sticky=W)
 Radiobutton(UI_frame, text="Tăng dần", variable=sort_order, value="Ascending", bg='grey').grid(row=2, column=1, padx=5, pady=5)
 Radiobutton(UI_frame, text="Giảm dần", variable=sort_order, value="Descending", bg='grey').grid(row=2, column=2, padx=5, pady=5)
+
 # Row[3]
 Button(UI_frame, text="Tạo mảng", command=Create_Array, bg='yellow').grid(row=3, column=0, padx=5, pady=5)
 Button(UI_frame, text="Nhập Mảng", command=Input_Array, bg='blue').grid(row=3, column=1, padx=5, pady=5)
 Button(UI_frame, text="Bắt đầu", command=Sort_Algorithm, bg='green').grid(row=3, column=2, padx=5, pady=5)
+
+root.bind('<space>', toggle_pause)
 
 root.mainloop()
