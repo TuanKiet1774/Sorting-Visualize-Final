@@ -66,7 +66,7 @@ Chương trình được xây dựng bằng ngôn ngữ **Python** và sử dụ
 ---
 
 ### 💾 Demo Ban Đầu
-- Chương trình demo trước khi chỉnh sữa sang chương trình này
+- Chương trình demo trước khi chỉnh sửa sang chương trình này
 - GitHub repository: [https://github.com/TuanKiet1774/Visualize-Sorting.git](https://github.com/TuanKiet1774/Visualize-Sorting.git)
 
 ---
