@@ -65,4 +65,10 @@ Chương trình được xây dựng bằng ngôn ngữ **Python** và sử dụ
 
 ---
 
+### 💾 Demo Ban Đầu
+- Chương trình demo trước khi chỉnh sữa sang chương trình này
+- GitHub repository: [https://github.com/TuanKiet1774/Visualize-Sorting.git](https://github.com/TuanKiet1774/Visualize-Sorting.git)
+
+---
+
 > 📚 Dự án cuối kỳ môn lập trình Python mang tính học thuật, tham khảo đối với sinh viên.
